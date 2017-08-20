@@ -28,11 +28,17 @@ labels = {
 name = raw_input('name: ')
 request = raw_input('phone number (p) or address (a)? ')
 
+key = request
 if request == 'p':
     key = 'phone'
 
 if request == 'a':
     key = 'addr'
 
-if name in people :
-    print "%s's %s is %s." % (name, labels[key], people[name][key])
+person = people.get(name, {})
+label = labels.get(key, key)
+result = person.get(key, 'not available')
+print "%s's %s is %s." % (name, label, result)
+
+# if name in people :
+#     print "%s's %s is %s." % (name, labels[key], people[name][key])
