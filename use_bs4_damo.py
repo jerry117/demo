@@ -9,10 +9,17 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = 'https://bj.lianjia.com/zufang/'
-responce = requests.get(url)
-soup = BeautifulSoup(responce.text, "html.parser")
-links_div = soup.find_all('div', class_="pic-panel")
-links = [div.a.get('href') for div in links_div]
 
-print links, len(links)
+def get_links(url):
+    responce = requests.get(url)
+    soup = BeautifulSoup(responce.text, "html.parser")
+    links_div = soup.find_all('div', class_="pic-panel")
+    links = [div.a.get('href') for div in links_div]
+    return links
+
+
+if __name__ == '__main__':
+    url = 'https://bj.lianjia.com/zufang/'
+    print get_links(url)
+
+
