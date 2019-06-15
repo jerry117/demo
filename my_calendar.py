@@ -32,6 +32,7 @@ datetime1.today.return_value = saturday
 
 assert is_weekday()
 
+# mock一个requests来控制自身行为
 requests = Mock()
 
 def get_holidays():
@@ -61,6 +62,7 @@ class TestCalendar(unittest.TestCase):
         return response_mock
 
     def test_get_holidays_logging(self):
+        # 测试成功，打印请求
         requests.get.side_effect = self.log_request
         assert get_holidays()['12/25'] == 'christmas'
 
