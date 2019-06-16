@@ -12,7 +12,7 @@ tuesday = datetime(year=2019, month=1, day=1)
 saturday = datetime(year=2019, month=1, day=5)
 
 # mock一个datetime来控制今天日期
-datetime1 = Mock()
+datetime = Mock()
 
 def is_weekday():
     today = datetime.today()
@@ -21,16 +21,16 @@ def is_weekday():
 
 
 # mock .today()返回周二
-datetime1.today.return_value = tuesday
+datetime.today.return_value = tuesday
 
-print(datetime1.today().weekday())
+print(datetime.today().weekday())
 print(datetime.today().weekday())
 # 测试周二是工作日
 assert is_weekday()
 
-datetime1.today.return_value = saturday
+datetime.today.return_value = saturday
 
-assert is_weekday()
+assert not is_weekday()
 
 # mock一个requests来控制自身行为
 requests = Mock()
@@ -59,6 +59,10 @@ class TestCalendar(unittest.TestCase):
         response_mock.status_code = 200
         response_mock.json.return_value = {'12/25':'christmas', '7/4': 'independence day',}
 
+        # 简洁的新式配置.configure_mokc()
+        # holidays = {'12/25':'christmas', '7/4': 'independence day',}
+        # response_mock = Mock(**{'json.return_value': holidays})
+
         return response_mock
 
     def test_get_holidays_logging(self):
@@ -68,17 +72,18 @@ class TestCalendar(unittest.TestCase):
 
 
     def test_get_holidays_retry(self):
+        # 创建一个新的mock对象模拟响应
         response_mock = Mock()
         response_mock.status_code = 200
         response_mock.json.return_value = {'12/25':'christmas', '7/4': 'independence day',}
-
+        # 为.get()设置侧面影响
         requests.get.side_effect = [Timeout, response_mock]
-
+        # 测试第一个请求抛出timeout异常
         with self.assertRaises(Timeout):
             get_holidays()
-
+        # 重试，期望返回成功的响应
         assert get_holidays()['12/25'] == 'christmas'
-
+        # 最后，断言.get()被调用3次，包括上一次，本来两次
         assert requests.get.call_count == 3
 
 
